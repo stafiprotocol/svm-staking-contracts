@@ -112,10 +112,10 @@ pub mod lsd_program {
         Ok(())
     }
 
-    pub fn claim(ctx: Context<Claim>) -> Result<()> {
+    pub fn claim(ctx: Context<Claim>, restake: bool) -> Result<()> {
         check_context(&ctx)?;
 
-        ctx.accounts.process()?;
+        ctx.accounts.process(restake)?;
 
         Ok(())
     }

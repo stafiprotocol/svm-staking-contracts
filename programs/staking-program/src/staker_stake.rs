@@ -95,6 +95,8 @@ impl<'info> Stake<'info> {
             self.token_mint.decimals,
         )?;
 
+        self.staking_pool.total_stake += stake_amount;
+
         if self.stake_account.user == Pubkey::default() {
             self.stake_account.set_inner(StakeAccount {
                 staking_pool: self.staking_pool.key(),
