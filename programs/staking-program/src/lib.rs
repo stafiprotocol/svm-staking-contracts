@@ -35,7 +35,7 @@ fn check_context<T: Bumps>(ctx: &Context<T>) -> Result<()> {
 }
 
 #[program]
-pub mod lsd_program {
+pub mod staking_program {
 
     use super::*;
 
