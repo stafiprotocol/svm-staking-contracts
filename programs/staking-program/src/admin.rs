@@ -98,19 +98,15 @@ pub struct AddRewards<'info> {
 
     #[account(
         mut,
-        has_one = admin @ Errors::AdminNotMatch
+        has_one = admin @ Errors::AdminNotMatch,
+        seeds = [
+            helper::POOL_SEED,
+            &staking_pool.token_mint.key().to_bytes(),
+            &staking_pool.creator.key().to_bytes(),
+        ],
+        bump = staking_pool.pool_seed_bump
     )]
     pub staking_pool: Box<Account<'info, StakingPool>>,
-
-    #[account(
-        mut,
-        seeds = [
-            helper::VAULT_SEED,
-            &staking_pool.key().to_bytes(),
-        ],
-        bump = staking_pool.vault_seed_bump
-    )]
-    pub pool_vault: SystemAccount<'info>,
 
     #[account(
         mut,
@@ -123,7 +119,7 @@ pub struct AddRewards<'info> {
     #[account(
         mut,
         associated_token::mint = token_mint,
-        associated_token::authority = pool_vault,
+        associated_token::authority = staking_pool,
         associated_token::token_program = token_program,
     )]
     pub pool_token_account: Box<InterfaceAccount<'info, TokenAccount>>,

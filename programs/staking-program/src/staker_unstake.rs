@@ -1,17 +1,22 @@
-use crate::{Errors, StakeAccount, StakingPool, UnstakeAccount};
-use anchor_lang::{prelude::*, solana_program::system_program};
+use crate::{helper, Errors, StakeAccount, StakingPool, UnstakeAccount};
+use anchor_lang::prelude::*;
 
 #[derive(Accounts)]
 pub struct Unstake<'info> {
     pub user: Signer<'info>,
 
-    #[account(
-        mut,
-        owner = system_program::ID
-    )]
+    #[account(mut)]
     pub rent_payer: Signer<'info>,
 
-    #[account(mut)]
+    #[account(
+        mut,
+        seeds = [
+            helper::POOL_SEED,
+            &staking_pool.token_mint.key().to_bytes(),
+            &staking_pool.creator.key().to_bytes(),
+        ],
+        bump = staking_pool.pool_seed_bump
+    )]
     pub staking_pool: Box<Account<'info, StakingPool>>,
 
     #[account(
@@ -66,6 +71,7 @@ impl<'info> Unstake<'info> {
             user: self.user.key(),
             amount: unstake_amount,
             withdrawable_timestamp: current_time + self.staking_pool.unbonding_seconds,
+            _reserved: [0u8; 128],
         });
 
         emit!(EventUnstake {

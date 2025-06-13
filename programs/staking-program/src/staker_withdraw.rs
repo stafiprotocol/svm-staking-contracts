@@ -10,17 +10,18 @@ pub struct Withdraw<'info> {
     pub user: SystemAccount<'info>,
 
     #[account(mut)]
-    pub staking_pool: Box<Account<'info, StakingPool>>,
+    pub rent_payer: Signer<'info>,
 
     #[account(
         mut,
         seeds = [
-            helper::VAULT_SEED,
-            &staking_pool.key().to_bytes(),
+            helper::POOL_SEED,
+            &staking_pool.token_mint.key().to_bytes(),
+            &staking_pool.creator.key().to_bytes(),
         ],
-        bump = staking_pool.vault_seed_bump
+        bump = staking_pool.pool_seed_bump
     )]
-    pub pool_vault_signer: SystemAccount<'info>,
+    pub staking_pool: Box<Account<'info, StakingPool>>,
 
     #[account(
         mut,
@@ -36,7 +37,8 @@ pub struct Withdraw<'info> {
     pub token_mint: Box<InterfaceAccount<'info, Mint>>,
 
     #[account(
-        mut,
+        init_if_needed,
+        payer = rent_payer,
         associated_token::mint = token_mint,
         associated_token::authority = user,
         associated_token::token_program = token_program,
@@ -46,7 +48,7 @@ pub struct Withdraw<'info> {
     #[account(
         mut,
         associated_token::mint = token_mint,
-        associated_token::authority = pool_vault_signer,
+        associated_token::authority = staking_pool,
         associated_token::token_program = token_program,
     )]
     pub pool_token_account: Box<InterfaceAccount<'info, TokenAccount>>,
@@ -95,12 +97,13 @@ impl<'info> Withdraw<'info> {
                     from: self.pool_token_account.to_account_info(),
                     mint: self.token_mint.to_account_info(),
                     to: self.user_token_account.to_account_info(),
-                    authority: self.pool_vault_signer.to_account_info(),
+                    authority: self.staking_pool.to_account_info(),
                 },
                 &[&[
-                    helper::VAULT_SEED,
-                    &self.staking_pool.key().to_bytes(),
-                    &[self.staking_pool.vault_seed_bump],
+                    helper::POOL_SEED,
+                    &self.staking_pool.token_mint.key().to_bytes(),
+                    &self.staking_pool.creator.key().to_bytes(),
+                    &[self.staking_pool.pool_seed_bump],
                 ]],
             ),
             withdraw_amount,

@@ -14,22 +14,21 @@ pub struct InitializeStakingPool<'info> {
     #[account(mut)]
     pub rent_payer: Signer<'info>,
 
+    pub token_mint: Box<InterfaceAccount<'info, Mint>>,
+
     #[account(
         init,
         space = 8 + std::mem::size_of::<StakingPool>(),
         payer = rent_payer,
         rent_exempt = enforce,
-    )]
-    pub staking_pool: Box<Account<'info, StakingPool>>,
-
-    #[account(
         seeds = [
-            helper::VAULT_SEED,
-            &staking_pool.key().to_bytes(),
+            helper::POOL_SEED,
+            &token_mint.key().to_bytes(),
+            &admin.key().to_bytes(),
         ],
         bump,
     )]
-    pub pool_vault_signer: SystemAccount<'info>,
+    pub staking_pool: Box<Account<'info, StakingPool>>,
 
     #[account(
         mut,
@@ -40,14 +39,13 @@ pub struct InitializeStakingPool<'info> {
     pub admin_token_account: Box<InterfaceAccount<'info, TokenAccount>>,
 
     #[account(
-        mut,
+        init,
+        payer = rent_payer,
         associated_token::mint = token_mint,
-        associated_token::authority = pool_vault_signer,
+        associated_token::authority = staking_pool,
         associated_token::token_program = token_program,
     )]
     pub pool_token_account: Box<InterfaceAccount<'info, TokenAccount>>,
-
-    pub token_mint: Box<InterfaceAccount<'info, Mint>>,
 
     pub token_program: Interface<'info, TokenInterface>,
     pub associated_token_program: Program<'info, AssociatedToken>,
@@ -67,7 +65,7 @@ impl<'info> InitializeStakingPool<'info> {
     pub fn process(
         &mut self,
         params: InitializeStakingPoolParams,
-        vault_seed_bump: u8,
+        pool_seed_bump: u8,
     ) -> Result<()> {
         require_gt!(params.reward_rate, 0, Errors::ParamsNotMatch);
         require_gt!(params.total_reward, 0, Errors::ParamsNotMatch);
@@ -90,9 +88,10 @@ impl<'info> InitializeStakingPool<'info> {
         }
 
         self.staking_pool.set_inner(StakingPool {
+            creator: self.admin.key(),
             admin: self.admin.key(),
             pending_admin: Pubkey::default(),
-            vault_seed_bump,
+            pool_seed_bump,
             token_mint: self.token_mint.key(),
             min_stake_amount: helper::DEFAULT_MIN_STAKE_AMOUNT,
             total_stake: 0,

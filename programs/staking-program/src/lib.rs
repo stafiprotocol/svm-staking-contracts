@@ -47,7 +47,7 @@ pub mod staking_program {
     ) -> Result<()> {
         check_context(&ctx)?;
 
-        ctx.accounts.process(params, ctx.bumps.pool_vault_signer)?;
+        ctx.accounts.process(params, ctx.bumps.staking_pool)?;
 
         Ok(())
     }

@@ -5,9 +5,10 @@ use anchor_lang::prelude::*;
 #[account]
 #[derive(Debug)]
 pub struct StakingPool {
+    pub creator: Pubkey,
     pub admin: Pubkey,
     pub pending_admin: Pubkey,
-    pub vault_seed_bump: u8,
+    pub pool_seed_bump: u8,
     pub token_mint: Pubkey,
 
     pub min_stake_amount: u64,
@@ -92,6 +93,9 @@ pub struct StakeAccount {
     pub amount: u64,
     pub reward: u64,
     pub reward_debt: u64,
+
+    /// Reserved space for future upgrades. Do not use.
+    pub _reserved: [u8; 128],
 }
 
 impl StakeAccount {
@@ -122,4 +126,7 @@ pub struct UnstakeAccount {
     pub user: Pubkey,
     pub amount: u64,
     pub withdrawable_timestamp: u64,
+
+    /// Reserved space for future upgrades. Do not use.
+    pub _reserved: [u8; 128],
 }

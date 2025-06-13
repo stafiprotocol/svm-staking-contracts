@@ -12,17 +12,16 @@ pub struct Stake<'info> {
     #[account(mut)]
     pub rent_payer: Signer<'info>,
 
-    #[account(mut)]
-    pub staking_pool: Box<Account<'info, StakingPool>>,
-
     #[account(
+        mut,
         seeds = [
-            helper::VAULT_SEED,
-            &staking_pool.key().to_bytes(),
+            helper::POOL_SEED,
+            &staking_pool.token_mint.key().to_bytes(),
+            &staking_pool.creator.key().to_bytes(),
         ],
-        bump = staking_pool.vault_seed_bump
+        bump = staking_pool.pool_seed_bump
     )]
-    pub pool_vault_signer: SystemAccount<'info>,
+    pub staking_pool: Box<Account<'info, StakingPool>>,
 
     #[account(
         address = staking_pool.token_mint @Errors::TokenMintAccountNotMatch
@@ -40,7 +39,7 @@ pub struct Stake<'info> {
     #[account(
         mut,
         associated_token::mint = token_mint,
-        associated_token::authority = pool_vault_signer,
+        associated_token::authority = staking_pool,
         associated_token::token_program = token_program,
     )]
     pub pool_token_account: Box<InterfaceAccount<'info, TokenAccount>>,
@@ -104,6 +103,7 @@ impl<'info> Stake<'info> {
                 amount: stake_amount,
                 reward: 0,
                 reward_debt: self.staking_pool.calc_reward_debt(stake_amount)?,
+                _reserved: [0u8; 128],
             });
         } else {
             self.stake_account
