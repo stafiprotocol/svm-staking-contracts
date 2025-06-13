@@ -64,44 +64,45 @@ pub struct EventClaim {
 
 impl<'info> Claim<'info> {
     pub fn process(&mut self, restake: bool) -> Result<()> {
-        require_gt!(self.stake_account.reward, 0, Errors::ClaimAmountZero);
-
         self.staking_pool.update_pool()?;
 
         self.stake_account
             .update_reward(self.staking_pool.reward_per_share)?;
 
         let claim_amount = self.stake_account.reward;
-        self.stake_account.reward = 0;
 
-        if restake {
-            self.stake_account.amount += claim_amount;
-            self.staking_pool.total_stake += claim_amount;
-        } else {
-            require_gte!(
-                self.pool_token_account.amount,
-                claim_amount,
-                Errors::PoolBalanceNotEnough
-            );
+        if claim_amount > 0 {
+            self.stake_account.reward = 0;
 
-            transfer_checked(
-                CpiContext::new_with_signer(
-                    self.token_program.to_account_info(),
-                    TransferChecked {
-                        from: self.pool_token_account.to_account_info(),
-                        mint: self.token_mint.to_account_info(),
-                        to: self.user_token_account.to_account_info(),
-                        authority: self.pool_vault_signer.to_account_info(),
-                    },
-                    &[&[
-                        helper::VAULT_SEED,
-                        &self.staking_pool.key().to_bytes(),
-                        &[self.staking_pool.vault_seed_bump],
-                    ]],
-                ),
-                claim_amount,
-                self.token_mint.decimals,
-            )?;
+            if restake {
+                self.stake_account.amount += claim_amount;
+                self.staking_pool.total_stake += claim_amount;
+            } else {
+                require_gte!(
+                    self.pool_token_account.amount,
+                    claim_amount,
+                    Errors::PoolBalanceNotEnough
+                );
+
+                transfer_checked(
+                    CpiContext::new_with_signer(
+                        self.token_program.to_account_info(),
+                        TransferChecked {
+                            from: self.pool_token_account.to_account_info(),
+                            mint: self.token_mint.to_account_info(),
+                            to: self.user_token_account.to_account_info(),
+                            authority: self.pool_vault_signer.to_account_info(),
+                        },
+                        &[&[
+                            helper::VAULT_SEED,
+                            &self.staking_pool.key().to_bytes(),
+                            &[self.staking_pool.vault_seed_bump],
+                        ]],
+                    ),
+                    claim_amount,
+                    self.token_mint.decimals,
+                )?;
+            }
         }
 
         self.stake_account
