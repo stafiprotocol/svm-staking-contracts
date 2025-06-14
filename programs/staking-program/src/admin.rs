@@ -60,7 +60,7 @@ pub struct Config<'info> {
 #[derive(Clone, Copy, Debug, Default, PartialEq, AnchorSerialize, AnchorDeserialize)]
 pub struct ConfigParams {
     pub min_stake_amount: Option<u64>,
-    pub reward_rate: Option<u128>,
+    pub reward_rate: Option<u64>,
     pub unbonding_seconds: Option<u64>,
     pub reward_algorithm: Option<RewardAlgorithm>,
 }

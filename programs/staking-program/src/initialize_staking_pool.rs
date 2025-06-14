@@ -31,7 +31,8 @@ pub struct InitializeStakingPool<'info> {
     pub staking_pool: Box<Account<'info, StakingPool>>,
 
     #[account(
-        mut,
+        init_if_needed,
+        payer = rent_payer,
         associated_token::mint = token_mint,
         associated_token::authority = admin,
         associated_token::token_program = token_program,
@@ -55,7 +56,7 @@ pub struct InitializeStakingPool<'info> {
 #[repr(C)]
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
 pub struct InitializeStakingPoolParams {
-    pub reward_rate: u128,
+    pub reward_rate: u64,
     pub total_reward: u64,
     pub unbonding_seconds: u64,
     pub reward_algorithm: RewardAlgorithm,
@@ -68,7 +69,7 @@ impl<'info> InitializeStakingPool<'info> {
         pool_seed_bump: u8,
     ) -> Result<()> {
         require_gt!(params.reward_rate, 0, Errors::ParamsNotMatch);
-        require_gt!(params.total_reward, 0, Errors::ParamsNotMatch);
+        require_gt!(params.unbonding_seconds, 0, Errors::ParamsNotMatch);
 
         if params.total_reward > 0 {
             let transfer_to_pool_cpi_context = CpiContext::new(

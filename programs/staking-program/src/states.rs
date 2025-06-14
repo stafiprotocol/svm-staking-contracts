@@ -13,7 +13,7 @@ pub struct StakingPool {
 
     pub min_stake_amount: u64,
     pub unbonding_seconds: u64,
-    pub reward_rate: u128, // decimals 12, reward amount of per token per second, The value of 1000 corresponds to an APR of 3.15%
+    pub reward_rate: u64, // decimals 12, reward amount of per token per second
     pub reward_algorithm: RewardAlgorithm,
 
     pub total_stake: u64,
@@ -34,7 +34,7 @@ impl StakingPool {
     pub fn calc_new_reward(&self, time_diff: u64) -> Result<u64> {
         match self.reward_algorithm {
             RewardAlgorithm::FixedRate => u64::try_from(
-                (self.total_stake as u128) * (time_diff as u128) * self.reward_rate
+                (self.total_stake as u128) * (time_diff as u128) * (self.reward_rate as u128)
                     / helper::REWARD_CALC_BASE,
             )
             .map_err(|_| error!(Errors::CalculationFail)),
@@ -60,7 +60,7 @@ impl StakingPool {
             return Ok(());
         }
 
-        if self.total_stake == 0 && self.last_reward_timestamp == 0 {
+        if self.total_stake == 0 {
             self.last_reward_timestamp = current_time;
             return Ok(());
         }

@@ -20,7 +20,7 @@ pub use crate::staker_unstake::*;
 pub use crate::staker_withdraw::*;
 pub use crate::states::*;
 
-declare_id!("CEftts4KkpMPiJg9hccAgqZHvUc3t1hx9VssMUGkX3ec");
+declare_id!("DjzuM5GR2NLjwcXAvzC5wqj8oTZD71FR5suCDGnx3GmB");
 
 fn check_context<T: Bumps>(ctx: &Context<T>) -> Result<()> {
     if !check_id(ctx.program_id) {
