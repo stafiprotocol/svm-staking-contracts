@@ -44,7 +44,7 @@ pub enum Errors {
     #[msg("Unstake amount is zero")]
     UnstakeAmountIsZero,
 
-    #[msg("Roken mint account not match")]
+    #[msg("Token mint account not match")]
     TokenMintAccountNotMatch,
 
     #[msg("Mint authority not match")]

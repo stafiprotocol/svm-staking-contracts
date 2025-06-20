@@ -73,6 +73,7 @@ impl<'info> Unstake<'info> {
             withdrawable_timestamp: current_time + self.staking_pool.unbonding_seconds,
             _reserved: [0u8; 128],
         });
+        self.staking_pool.total_stake -= unstake_amount;
 
         emit!(EventUnstake {
             staker: self.user.key(),
