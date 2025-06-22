@@ -1,4 +1,4 @@
-use crate::{helper, Errors, RewardAlgorithm, StakingPool};
+use crate::{Errors, RewardAlgorithm, StakingPool};
 use anchor_lang::prelude::*;
 use anchor_spl::associated_token::AssociatedToken;
 use anchor_spl::token_interface::{
@@ -96,16 +96,7 @@ impl<'info> Config<'info> {
 pub struct AddRewards<'info> {
     pub admin: Signer<'info>,
 
-    #[account(
-        mut,
-        has_one = admin @ Errors::AdminNotMatch,
-        seeds = [
-            helper::POOL_SEED,
-            &staking_pool.token_mint.key().to_bytes(),
-            &staking_pool.creator.key().to_bytes(),
-        ],
-        bump = staking_pool.pool_seed_bump
-    )]
+    #[account(mut)]
     pub staking_pool: Box<Account<'info, StakingPool>>,
 
     #[account(

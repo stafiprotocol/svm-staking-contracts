@@ -12,15 +12,7 @@ pub struct Stake<'info> {
     #[account(mut)]
     pub rent_payer: Signer<'info>,
 
-    #[account(
-        mut,
-        seeds = [
-            helper::POOL_SEED,
-            &staking_pool.token_mint.key().to_bytes(),
-            &staking_pool.creator.key().to_bytes(),
-        ],
-        bump = staking_pool.pool_seed_bump
-    )]
+    #[account(mut)]
     pub staking_pool: Box<Account<'info, StakingPool>>,
 
     #[account(

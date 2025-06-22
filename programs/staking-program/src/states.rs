@@ -6,6 +6,7 @@ use anchor_lang::prelude::*;
 #[derive(Debug)]
 pub struct StakingPool {
     pub creator: Pubkey,
+    pub index: u8,
     pub admin: Pubkey,
     pub pending_admin: Pubkey,
     pub pool_seed_bump: u8,

@@ -12,15 +12,7 @@ pub struct Withdraw<'info> {
     #[account(mut)]
     pub rent_payer: Signer<'info>,
 
-    #[account(
-        mut,
-        seeds = [
-            helper::POOL_SEED,
-            &staking_pool.token_mint.key().to_bytes(),
-            &staking_pool.creator.key().to_bytes(),
-        ],
-        bump = staking_pool.pool_seed_bump
-    )]
+    #[account(mut)]
     pub staking_pool: Box<Account<'info, StakingPool>>,
 
     #[account(
@@ -103,6 +95,7 @@ impl<'info> Withdraw<'info> {
                     helper::POOL_SEED,
                     &self.staking_pool.token_mint.key().to_bytes(),
                     &self.staking_pool.creator.key().to_bytes(),
+                    &[self.staking_pool.index],
                     &[self.staking_pool.pool_seed_bump],
                 ]],
             ),

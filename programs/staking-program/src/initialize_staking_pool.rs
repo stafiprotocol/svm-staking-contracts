@@ -8,6 +8,7 @@ use anchor_spl::token_interface::{
 };
 
 #[derive(Accounts)]
+#[instruction(params: InitializeStakingPoolParams)]
 pub struct InitializeStakingPool<'info> {
     pub admin: Signer<'info>,
 
@@ -25,6 +26,7 @@ pub struct InitializeStakingPool<'info> {
             helper::POOL_SEED,
             &token_mint.key().to_bytes(),
             &admin.key().to_bytes(),
+            &[params.index],
         ],
         bump,
     )]
@@ -60,6 +62,7 @@ pub struct InitializeStakingPoolParams {
     pub total_reward: u64,
     pub unbonding_seconds: u64,
     pub reward_algorithm: RewardAlgorithm,
+    pub index: u8,
 }
 
 impl<'info> InitializeStakingPool<'info> {
@@ -90,6 +93,7 @@ impl<'info> InitializeStakingPool<'info> {
 
         self.staking_pool.set_inner(StakingPool {
             creator: self.admin.key(),
+            index: params.index,
             admin: self.admin.key(),
             pending_admin: Pubkey::default(),
             pool_seed_bump,
