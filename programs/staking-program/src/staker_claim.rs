@@ -7,8 +7,7 @@ use anchor_spl::token_interface::{
 
 #[derive(Accounts)]
 pub struct Claim<'info> {
-    /// CHECK:
-    pub user: AccountInfo<'info>,
+    pub user: Signer<'info>,
 
     #[account(mut)]
     pub rent_payer: Signer<'info>,

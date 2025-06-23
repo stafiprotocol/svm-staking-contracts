@@ -7,8 +7,7 @@ use anchor_spl::token_interface::{
 
 #[derive(Accounts)]
 pub struct Withdraw<'info> {
-    /// CHECK:
-    pub user: AccountInfo<'info>,
+    pub user: Signer<'info>,
 
     #[account(mut)]
     pub rent_payer: Signer<'info>,
@@ -18,7 +17,7 @@ pub struct Withdraw<'info> {
 
     #[account(
         mut,
-        close = user,
+        close = rent_payer,
         has_one = staking_pool @Errors::InvalidUnstakeAccount,
         has_one = user @Errors::InvalidUnstakeAccount,
     )]
