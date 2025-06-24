@@ -101,6 +101,7 @@ impl<'info> InitializeStakingPool<'info> {
             min_stake_amount: helper::DEFAULT_MIN_STAKE_AMOUNT,
             total_stake: 0,
             total_reward: params.total_reward,
+            undistributed_reward: params.total_reward,
             reward_rate: params.reward_rate,
             reward_algorithm: params.reward_algorithm,
             last_reward_timestamp: 0,

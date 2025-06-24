@@ -143,6 +143,7 @@ impl<'info> AddRewards<'info> {
         )?;
 
         self.staking_pool.total_reward += amount;
+        self.staking_pool.undistributed_reward += amount;
 
         msg!("AddRewards: {}", amount);
         Ok(())

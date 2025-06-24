@@ -19,6 +19,7 @@ pub struct StakingPool {
 
     pub total_stake: u64,
     pub total_reward: u64,
+    pub undistributed_reward: u64,
     pub last_reward_timestamp: u64,
     pub reward_per_share: u128,
 
@@ -70,11 +71,11 @@ impl StakingPool {
         let mut reward = self.calc_new_reward(time_diff)?;
 
         if reward > 0 {
-            if self.total_reward >= reward {
-                self.total_reward -= reward;
+            if self.undistributed_reward >= reward {
+                self.undistributed_reward -= reward;
             } else {
-                reward = self.total_reward;
-                self.total_reward = 0;
+                reward = self.undistributed_reward;
+                self.undistributed_reward = 0;
             }
 
             self.reward_per_share = self.calc_reward_per_share(reward)?;
