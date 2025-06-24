@@ -1,0 +1,7 @@
+{
+    "name": "anchor-dev-env",
+    "build": {
+        "dockerfile": "Dockerfile"
+    },
+    "remoteUser": "root"
+}
