@@ -29,15 +29,20 @@ pub struct StakingPool {
 
 #[derive(Clone, Copy, Debug, AnchorSerialize, AnchorDeserialize, PartialEq, Eq)]
 pub enum RewardAlgorithm {
-    FixedRate,
+    FixedPerTokenPerSecond,
+    FixedTotalPerSecond,
 }
 
 impl StakingPool {
     pub fn calc_new_reward(&self, time_diff: u64) -> Result<u64> {
         match self.reward_algorithm {
-            RewardAlgorithm::FixedRate => u64::try_from(
+            RewardAlgorithm::FixedPerTokenPerSecond => u64::try_from(
                 (self.total_stake as u128) * (time_diff as u128) * (self.reward_rate as u128)
                     / helper::REWARD_CALC_BASE,
+            )
+            .map_err(|_| error!(Errors::CalculationFail)),
+            RewardAlgorithm::FixedTotalPerSecond => u64::try_from(
+                (time_diff as u128) * (self.reward_rate as u128) / helper::REWARD_CALC_BASE,
             )
             .map_err(|_| error!(Errors::CalculationFail)),
         }
