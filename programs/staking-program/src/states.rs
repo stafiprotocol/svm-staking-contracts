@@ -14,7 +14,16 @@ pub struct StakingPool {
 
     pub min_stake_amount: u64,
     pub unbonding_seconds: u64,
-    pub reward_rate: u64, // decimals 12, reward amount of per token per second
+
+    /// For FixedPerTokenPerSecond: per staked smallest unit per second.
+    ///
+    ///     Reward rate is scaled by 1e12 to support fractional values.
+    ///     Reward rate is in **smallest token unit per second(after scaling)**.
+    ///
+    /// For FixedTotalPerSecond: total reward per second in smallest units.
+    ///
+    ///     Reward rate is in **smallest token unit per second**.
+    pub reward_rate: u64,
     pub reward_algorithm: RewardAlgorithm,
 
     pub total_stake: u64,
@@ -41,10 +50,10 @@ impl StakingPool {
                     / helper::REWARD_CALC_BASE,
             )
             .map_err(|_| error!(Errors::CalculationFail)),
-            RewardAlgorithm::FixedTotalPerSecond => u64::try_from(
-                (time_diff as u128) * (self.reward_rate as u128) / helper::REWARD_CALC_BASE,
-            )
-            .map_err(|_| error!(Errors::CalculationFail)),
+            RewardAlgorithm::FixedTotalPerSecond => {
+                u64::try_from((time_diff as u128) * (self.reward_rate as u128))
+                    .map_err(|_| error!(Errors::CalculationFail))
+            }
         }
     }
 
