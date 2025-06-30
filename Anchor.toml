@@ -1,0 +1,11 @@
+[toolchain]
+anchor_version = "0.29.0"
+solana_version = "1.18.15"
+
+[features]
+seeds = false
+skip-lint = false
+
+[provider]
+cluster = "https://api.devnet.solana.com"
+wallet = "~/.config/solana/id.json"
