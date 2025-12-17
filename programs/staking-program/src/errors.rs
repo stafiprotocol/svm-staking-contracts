@@ -35,9 +35,6 @@ pub enum Errors {
     #[msg("Unstake account amount zero")]
     UnstakeAccountAmountZero,
 
-    #[msg("Claim amount zero")]
-    ClaimAmountZero,
-
     #[msg("Pool balance not enough")]
     PoolBalanceNotEnough,
 
@@ -46,9 +43,6 @@ pub enum Errors {
 
     #[msg("Token mint account not match")]
     TokenMintAccountNotMatch,
-
-    #[msg("Mint authority not match")]
-    MintAuthorityNotMatch,
 
     #[msg("Pending admin not match")]
     PendingAdminNotMatch,
